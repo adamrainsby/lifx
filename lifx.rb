@@ -1,5 +1,4 @@
 require 'net/https'
-require 'json'
 
 def http uri
   http = Net::HTTP.new(uri.host, uri.port)
@@ -20,16 +19,12 @@ def select_http_method http_method
 end
 
 def request method, uri, data = {}
-  request = select_http_method(method).new(uri.request_uri)
+  request = select_http_method(method).new(uri)
 
   request['Authorization'] = "Bearer #{ENV['LIFX_APP_TOKEN']}"
   request.set_form_data(data) unless data.empty?
   http(uri).request(request)
 end
 
-uri = URI('https://api.lifx.com/v1/lights/all')
-response = request :get, uri
-id = JSON.parse(response.body).first['id']
-
-uri = URI("https://api.lifx.com/v1/lights/#{id}/effects/breathe")
-response = request :post, uri, {'color' => 'blue'}
+uri = URI("https://api.lifx.com/v1/lights/all/effects/breathe")
+response = request :post, uri, {'color' => 'green'}
